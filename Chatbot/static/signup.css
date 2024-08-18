@@ -1,0 +1,96 @@
+body {
+    font-family: Arial, sans-serif;
+    /* background: linear-gradient(135deg, #f093fb, #f5576c); */
+    background-color: #373737;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.signin-container {
+    /* background: rgba(255, 255, 255, 0.9); */
+    background: rgba(83, 83, 83, 0.9);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 350px;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+.signin-container:hover {
+    transform: translateY(-5px);
+}
+.signin-container h2 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+.signin-container input[type="text"],
+.signin-container input[type="email"],
+.signin-container input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+.signin-container input[type="text"]:focus,
+.signin-container input[type="email"]:focus,
+.signin-container input[type="password"]:focus {
+    border-bottom: 1px solid;
+    border-color: #fff;
+    outline: none;
+}
+.signin-container input[type="submit"] {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+.signin-container input[type="submit"]:hover {
+    background: linear-gradient(135deg, #f5576c, #f093fb);
+    transform: translateY(-2px);
+}
+.signin-container .social-login {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+.signin-container .social-login button {
+    width: 48%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.signin-container .social-login .google {
+    background-color: #db4a39;
+    color: white;
+}
+.signin-container .social-login .facebook {
+    background-color: #3b5998;
+    color: white;
+}
+.signin-container .social-login button:hover {
+    opacity: 0.8;
+}
+.signin-container .login-link {
+    margin-top: 10px;
+    font-size: 14px;
+}
+.signin-container .login-link a {
+    color: #dddddd;
+    text-decoration: none;
+    font-weight: bold;
+}

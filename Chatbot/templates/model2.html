@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <title>Chatbot Interface</title>
+    <link rel="stylesheet" href="/static/model.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="chat-title">
+          <div class="toggle-sidebar" id="toggleSidebar">=</div>
+          <img src="/media/logo.png" alt="Model Logo" />
+          <h1>Chatbot</h1>
+        </div>
+        {% if user.is_authenticated %}
+          <div class="user-info">
+            <div class="user-menu" id="userMenu">
+              <span class="user-name"
+                >Welcome, <span>{{ user.first_name }} ▼</span></span
+              >
+              <div class="dropdown-content" id="dropdownContent">
+                <a href="{% url 'logout' %}">Logout</a>
+                {% csrf_token %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content-section">
+          <div class="sidebar" id="sideBar">
+            <h3>Previous Queries</h3>
+            <ul id="queryHistory">
+              <!-- Previous queries will be dynamically added here -->
+            </ul>
+            <div class="footer">
+              <!-- Constant footer content -->
+              <p>&copy; 2024 Azad. All rights reserved.</p>
+            </div>
+          </div>
+          <div class="main-content">
+            <div class="chat-window" id="chatWindow">
+              <!-- Chat messages will be dynamically added here -->
+            </div>
+            <div class="input-area">
+              <input
+                type="text"
+                id="userInput"
+                placeholder="Type your message..."
+              />
+              <button id="sendButton">↗</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      {% endif %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      const csrftoken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
+
+      $.ajaxSetup({
+        headers: {
+          "X-CSRFToken": csrftoken,
+        },
+      });
+
+      const chatWindow = document.getElementById("chatWindow");
+      const queryHistory = document.getElementById("queryHistory");
+      const userInput = document.getElementById("userInput");
+      const sendButton = document.getElementById("sendButton");
+      const toggleButton = document.getElementById("toggleSidebar");
+
+      const loadConversationHistory = () => {
+        const history =
+          JSON.parse(localStorage.getItem("conversationHistory")) || [];
+        queryHistory.innerHTML = ""; // Clear previous entries
+        history.forEach((entry) => {
+          const li = document.createElement("li");
+          li.textContent = entry.query;
+          queryHistory.appendChild(li);
+        });
+        queryHistory.scrollTop = queryHistory.scrollHeight; // Scroll to the latest entry
+      };
+
+      const saveToConversationHistory = (query) => {
+        const history =
+          JSON.parse(localStorage.getItem("conversationHistory")) || [];
+        history.push({ query });
+        localStorage.setItem("conversationHistory", JSON.stringify(history));
+        loadConversationHistory(); // Refresh the list
+      };
+
+      const addMessage = (text, isUser) => {
+        const message = document.createElement("div");
+        message.className = `message ${
+          isUser ? "user-message" : "bot-message"
+        }`;
+        message.innerHTML = text; // Use innerHTML to render formatted text
+        chatWindow.appendChild(message);
+        chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the latest message
+      };
+
+      const addMessageEventHandler = () => {
+        const prompt = userInput.value.trim();
+        if (prompt === "") return;
+
+        addMessage(prompt, true); // Display user message
+        saveToConversationHistory(prompt); // Save query for history
+
+        $.post("/api/chat/", { prompt }, function (data) {
+          addMessage(data.response, false); // Display bot response with formatted text
+        }).fail(function () {
+          addMessage("Error: Could not contact the server.", false);
+        });
+
+        userInput.value = ""; // Clear input field
+      };
+
+      sendButton.addEventListener("click", addMessageEventHandler);
+
+      userInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          addMessageEventHandler();
+        }
+      });
+
+      toggleButton.addEventListener("click", () => {
+        const sideBar = document.querySelector(".sidebar");
+
+        // Toggle the display property
+        if (sideBar.style.display === "block" || sideBar.style.display === "") {
+          sideBar.style.display = "none";
+        } else {
+          sideBar.style.display = "block";
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const userMenu = document.getElementById("userMenu");
+        const dropdownContent = document.getElementById("dropdownContent");
+
+        userMenu.addEventListener("click", function () {
+          dropdownContent.style.display =
+            dropdownContent.style.display === "block" ? "none" : "block";
+        });
+
+        // Optional: Close the dropdown if clicking outside
+        document.addEventListener("click", function (event) {
+          if (!userMenu.contains(event.target)) {
+            dropdownContent.style.display = "none";
+          }
+        });
+      });
+
+      loadConversationHistory(); // Load history on page load
+    </script>
+  </body>
+</html>

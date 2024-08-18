@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Chatbot{% endblock title %}</title>
+    <link rel="stylesheet" href="static/index.css">
+    
+</head>
+<body>
+    <header>
+        <h1 class="app-name">Chatbot</h1>
+    </header>
+    <nav>
+        <a href="/login">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
+    </nav>
+    <main>
+        <p>This is the home page of your chatbot project. Use the navigation links above to log in or sign up. Our chatbot provides an interactive experience, handling your queries effectively and learning from your interactions.</p>
+    </main>
+</body>
+</html>

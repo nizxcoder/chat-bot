@@ -1,0 +1,77 @@
+body {
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Arial', sans-serif;
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* background: linear-gradient(to right, #7b7b7b, #292929); Updated gradient */
+    background-color: #202020;
+    color: #fff;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+header {
+    padding: 20px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.32);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.377);
+}
+
+.header-title{
+    color: #8f8f8f;
+}
+
+.app-name{
+    font-size: 3rem;
+}
+nav {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    /* background: rgba(0, 0, 0, 0.4); */
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 0 20px;
+    padding: 10px 50px;
+    background: rgba(255, 255, 255, 0.112);
+    border-radius: 50px; /* Rounded buttons */
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    border: 2px solid transparent;
+}
+nav a:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Slight shadow on hover */
+}
+main {
+    padding: 80px 20px; /* Increased top padding */
+    text-align: center;
+}
+main h2 {
+    margin-bottom: 15px;
+    font-size: 2em;
+    font-weight: 300;
+}
+main p {
+    margin: 0 auto;
+    max-width: 700px;
+    line-height: 1.6;
+    font-size: 1.1em; /* Slightly larger text */
+}
+@media (max-width: 600px) {
+    nav {
+        flex-direction: column;
+    }
+    nav a {
+        margin: 10px;
+        padding: 12px 30px; /* Adjusted padding for smaller screens */
+        font-size: 0.9em; /* Slightly smaller text */
+    }
+}

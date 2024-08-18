@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Chat</title>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-title img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info span {
+            margin-right: 20px;
+        }
+
+        .sidebar {
+            width: 20%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .input-area {
+            display: flex;
+            padding: 10px 0;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .input-area button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .input-area button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 60%;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .dark-mode {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #f1f1f1;
+        }
+
+        .dark-mode .chat-window {
+            background: rgba(50, 50, 50, 0.6);
+        }
+
+        .dark-mode .user-message {
+            background-color: #0056b3;
+        }
+
+        .dark-mode .bot-message {
+            background-color: #333;
+            color: #f1f1f1;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="chat-title">
+                <img src="/media/chatbot_logo.jpeg" alt="Model Logo">
+                <h1>Chatbot</h1>
+            </div>
+            <div class="user-info">
+                <span>Welcome, {{ user.first_name }}</span>
+                <a href="{% url 'logout' %}">Logout</a>
+            </div>
+        </div>
+        <div class="sidebar">
+            <h3>Previous Queries</h3>
+            <ul id="queryHistory">
+                <!-- Previous queries will be dynamically added here -->
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="chat-window" id="chatWindow">
+                <!-- Chat messages will be dynamically added here -->
+            </div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your message...">
+                <button id="sendButton">Send</button>
+            </div>
+        </div>
+        <footer>{% block footer %}Developed by Azad{% endblock footer %}</footer>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        });
+
+        const chatWindow = document.getElementById('chatWindow');
+        const queryHistory = document.getElementById('queryHistory');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        const loadConversationHistory = () => {
+            const history = JSON.parse(localStorage.getItem('conversationHistory')) || [];
+            queryHistory.innerHTML = ''; // Clear previous entries
+            history.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = entry.query;
+                queryHistory.appendChild(li);
+            });
+            queryHistory.scrollTop = queryHistory.scrollHeight; // Scroll to the latest entry
+        };
+
+        const saveToConversationHistory = (query) => {
+            const history = JSON.parse(localStorage.getItem('conversationHistory')) || [];
+            history.push({ query });
+            localStorage.setItem('conversationHistory', JSON.stringify(history));
+            loadConversationHistory(); // Refresh the list
+        };
+
+        const addMessage = (text, isUser) => {
+            const message = document.createElement('div');
+            message.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            message.textContent = text;
+            chatWindow.appendChild(message);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the latest message
+        };
+
+        sendButton.addEventListener('click', () => {
+            const prompt = userInput.value.trim();
+            if (prompt === '') return;
+
+            addMessage(prompt, true); // Display user message
+            saveToConversationHistory(prompt); // Save query for history
+
+            $.post("/api/chat/", { prompt }, function(data) {
+                addMessage(data.response, false); // Display bot response
+            }).fail(function() {
+                addMessage('Error: Could not contact the server.', false);
+            });
+
+            userInput.value = ''; // Clear input field
+        });
+
+        loadConversationHistory(); // Load history on page load
+    </script>
+    
+</body>
+</html>

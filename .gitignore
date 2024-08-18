@@ -1,0 +1,27 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# Database
+db.sqlite3
+
+# Media and static files
+/media/
+/staticfiles/
+
+# Logs
+*.log
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Virtual environment
+venv/
